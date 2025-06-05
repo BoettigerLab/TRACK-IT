@@ -1,6 +1,8 @@
 # TRansposon Assisted Chromatin Kinetic Imaging Technology (TRACK-IT)
+[![DOI](https://zenodo.org/badge/939114102.svg)](https://doi.org/10.5281/zenodo.15604035)
 
 Joo Lee<sup>1</sup>, Liang-Fu Chen<sup>1</sup>, Simon Gaudin<sup>1,2</sup>, Kavvya Gupta<sup>1</sup>, Andrew Spakowitz<sup>3</sup>, Alistair Nicol Boettiger<sup>1</sup>
+
 <sup>1</sup>Department of Developmental Biology, Stanford University
 <sup>2</sup>Department of Genetics, Stanford University
 <sup>3</sup>Department of Chemical Engineering, Stanford University
