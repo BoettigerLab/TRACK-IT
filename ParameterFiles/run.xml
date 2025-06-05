@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<sequence>
+  
+
+  <DASetDirectory>
+    <directory type="str">E:\Jude\2024-04-10_1157\</directory>
+  </DASetDirectory>
+  <branch name="Movie Loop">
+    <branch name="Delay_0">
+      <DAMoveStage>
+        <stage_x type="float">-9097.0</stage_x>
+        <stage_y type="float">-8798.55</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_0">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_0</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_1">
+      <DAMoveStage>
+        <stage_x type="float">-8434.1</stage_x>
+        <stage_y type="float">-8331.4</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_1">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_1</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_2">
+      <DAMoveStage>
+        <stage_x type="float">-17544.9</stage_x>
+        <stage_y type="float">-8996.4</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_2">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_2</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_3">
+      <DAMoveStage>
+        <stage_x type="float">-17261.2</stage_x>
+        <stage_y type="float">-8471.5</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_3">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_3</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_4">
+      <DAMoveStage>
+        <stage_x type="float">-27192.15</stage_x>
+        <stage_y type="float">-9548.3</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_4">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_4</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_5">
+      <DAMoveStage>
+        <stage_x type="float">-26770.1</stage_x>
+        <stage_y type="float">-8358.05</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_5">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_5</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_6">
+      <DAMoveStage>
+        <stage_x type="float">-36700.75</stage_x>
+        <stage_y type="float">-10024.8</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_6">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_6</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+    <branch name="Delay_7">
+      <DAMoveStage>
+        <stage_x type="float">-36707.2</stage_x>
+        <stage_y type="float">-9442.3</stage_y>
+      </DAMoveStage>
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DACheckFocus>
+        <num_focus_checks>100</num_focus_checks>
+        <focus_scan/>
+        <scan_range>20</scan_range>
+      </DACheckFocus>
+      <DADelay>
+        <delay type="int">2500</delay>
+      </DADelay>
+    </branch>
+    <branch name="sample_7">
+      <DASetFocusLockTarget>
+        <lock_target type="float">-0.475</lock_target>
+      </DASetFocusLockTarget>
+      <DASetParameters>
+        <parameters type="str">2cam_488_561_4um</parameters>
+      </DASetParameters>
+      <DATakeMovie>
+        <name type="str">sample_7</name>
+        <length type="int">18000</length>
+        <parameters type="str">2cam_488_561_4um</parameters>
+        <overwrite type="bool">True</overwrite>
+      </DATakeMovie>
+    </branch>
+  </branch>
+</sequence>

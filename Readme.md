@@ -18,10 +18,10 @@ Questions should be addressed to Alistair Boettiger, boettiger@stanford.edu
 1. Spotfinding using storm-analysis - efficient spot-fitting algorithms for dense data.
 https://github.com/ZhuangLab/storm-analysis/releases
 
-2. Particle tracing using ORCA-public https://github.com/BoettigerLab/ORCA-public - contains functions called by the TRACK-IT analysis.
+2. Particle tracing using ORCA-public https://github.com/BoettigerLab/ORCA-public - contains functions called by the TRACK-IT analysis.  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15603850.svg)](https://doi.org/10.5281/zenodo.15603850)
 
 
-3. Polymer simulations from polychrom https://github.com/BoettigerLab/polychrom - software for molecular dynamics simulations of loop extrusion.
+3. Polymer simulations from polychrom https://github.com/BoettigerLab/polychrom - software for molecular dynamics simulations of loop extrusion. [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7698987.svg)](https://doi.org/10.5281/zenodo.7698987)
 forked from https://github.com/open2c/polychrom. 
 
 ## Organization
@@ -36,5 +36,8 @@ Contains a graphical user interface App (written in the matlab App builder) to c
 ### FigureCode
 Contains scripts used to produce the graphs and analyses presented in the figures of our manuscript
 
+### ParameterFiles
+Contains example parameter files used in mufit-analysis from the storm-analysis toolbox, as described in the methods. 
+
 ## Data availability
-The processed data files will be available on the 4DN data portal (currently processing submission).  
+ Live cell tracking data is available on Zenodo: doi:10.5281/zenodo.15603650 and has been submitted for hosting at the 4DN data portal and is under review.  Accession numbers will be updated when available.

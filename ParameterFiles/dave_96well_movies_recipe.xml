@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<recipe>
+<base_directory path="" />
+
+<!--These commands will be executed in the order written here-->
+<command_sequence> 
+<!--Specify a save folder-->
+<change_directory>E:\Jude\2024-04-10_1157\</change_directory>
+    <loop name = "Movie Loop" increment = "name">	<!--This is a loop over positions at every time-->
+        <item name = "Delay"></item>
+        <item name = "2cam_488_561_4um"></item>          <!--Record Movie (see below)-->   
+    </loop>
+         <!--Wait some time before starting the next movie (see below)-->    
+</command_sequence>
+
+
+<!--Here we define all the items used above (typically movies with different parameters)-->
+<!--
+Instead of using items we could have just had the movie part straight in the command sequence
+Popping it out like this can make the overall command sequence easier to read. 
+-->
+<item name = "2cam_488_561_4um">
+    <movie>
+       <name increment="Yes">sample</name>
+       <length>18000</length>
+       <parameters>2cam_488_561_4um</parameters>
+       <lock_target>-0.475</lock_target> 
+       <overwrite>True</overwrite>
+    </movie>
+</item>
+
+<item name = "2cam_488_561_2um">
+    <movie>
+       <name increment="Yes">sample</name>
+       <length>18000</length>
+       <parameters>2cam_488_561</parameters>
+       <lock_target>-0.475</lock_target> 
+       <overwrite>True</overwrite>
+    </movie>
+</item>
+
+<item name = "Delay">
+    <movie>
+       <name increment="Yes">Delay</name>
+       <length>0</length>
+       <variable_entry name = "Movie Loop" />
+       <lock_target>-0.475</lock_target>
+       <check_focus>
+			<num_focus_checks>100</num_focus_checks>
+			<focus_scan/>
+			<scan_range>20</scan_range>
+	   </check_focus>
+       <!-- Wait time in miliseconds -->
+       <delay>2500</delay>
+    </movie>
+</item>
+
+<!-- This loops over the positions -->
+<loop_variable name = "Positions Loop">
+   <value><stage_x>0.0</stage_x><stage_y>0.0</stage_y></value>
+   <value><stage_x>100.0</stage_x><stage_y>100.0</stage_y></value>
+</loop_variable>
+
+<!-- If you prefer to use Steve to create a text file of positions you
+can specify a file like this:  --> 
+<loop_variable name = "Movie Loop">
+   <file_path>E:\Jude\2024-04-10_1157\well_positions.txt</file_path>
+</loop_variable>
+
+
+<!-- This is our Time loop -->
+<!-- 20 time loops -->
+<loop_variable name = "Time Loop">
+   <value><stage_x>0.0</stage_x><stage_y>0.0</stage_y></value>
+</loop_variable>
+<!-- The loop just runs for however many line commands are here. 
+We don't actually need to change anything since it's just a time delay. 
+So we write the same thing T times here (I've used return to original stage position).
+The delay part itself is happening because of the "delay" item embedded in the loop,
+not because of the values we set here. 
+You could also use repeat set parameter values here.
+-->
+
+</recipe>

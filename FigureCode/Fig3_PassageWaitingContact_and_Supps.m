@@ -325,7 +325,7 @@ ylabel('ave. contact duration (s)');
 %%  SUPPLEMENT, alternate thresholds
 
 figure(10); clf;
-thetas = [30, 50, 100, 200, 350 500];
+thetas = [30, 50, 100, 200, 350, 500];
 k=0;
 N=length(thetas);
 maxSamples =1e3;
@@ -333,10 +333,6 @@ nt_wt_T  =cell(N,1);
 nt_ci_wt_T =cell(N,1);
 dTag_wt_T =cell(N,1); 
 dTag_ci_wt_T =cell(N,1);   
-nt_pt_T =cell(N,1);   
-nt_ci_pt_T =cell(N,1); 
-dTag_pt_T =cell(N,1); 
-dTag_ci_pt_T =cell(N,1);    
 p3_freq_nt_T =cell(N,1);  
 p3_freq_nt_ci_T   =cell(N,1);  
 p3_freq_dTag_T =cell(N,1);  
@@ -347,12 +343,10 @@ cd_dTag_T =cell(N,1);
 cd_dTag_ci_T =cell(N,1);  
 for t=1:N
     theta = thetas(t);    
-    [nt_wt_T{t},   nt_ci_wt_T{t}] = CompContactWaitingKM(data3D(1,:),'d_contact',theta,'maxSamples',maxSamples);
-    [dTag_wt_T{t}, dTag_ci_wt_T{t}] = CompContactWaitingKM(data3D(2,:),'d_contact',theta,'maxSamples',maxSamples);
-    
-    [nt_pt_T{t},   nt_ci_pt_T{t}] = CompFirstPassageKM(data3D(1,:),'d_contact',theta,'maxSamples',maxSamples);
-    [dTag_pt_T{t}, dTag_ci_pt_T{t}] = CompFirstPassageKM(data3D(2,:),'d_contact',theta,'maxSamples',maxSamples);
-        
+    [nt_wt_T{t},   nt_ci_wt_T{t}] = CompContactWaitingKM(data3D(1,:),'d_contact',theta,'maxSamples',maxSamples,'iters',10);
+    [dTag_wt_T{t}, dTag_ci_wt_T{t}] = CompContactWaitingKM(data3D(2,:),'d_contact',theta,'maxSamples',maxSamples,'iters',10);
+    [p3_freq_nt_T{t},p3_freq_nt_ci_T{t}] = CompPassageFreq(data3D(1,:),'d_contact',theta,'iters',10);
+    [p3_freq_dTag_T{t},p3_freq_dTag_ci_T{t}] = CompPassageFreq(data3D(2,:),'d_contact',theta,'iters',10);   
     [cd_nt_T{t},cd_nt_ci_T{t}] = ContactDurationKM(data3D(1,:),'theta',theta);
     [cd_dTag_T{t},cd_dTag_ci_T{t}] = ContactDurationKM(data3D(2,:),'theta',theta);   
 end
@@ -366,14 +360,18 @@ for t=1:N
     spf = 0.5; % seconds per frame 
     
     tb = 600;
-    if thetas(t)<300; k=3; else k=1; end
-    subplot(4,N,t);
+    if thetas(t)<300 
+        k=3; 
+    else 
+        k=1; 
+    end
+    subplot(3,N,t);
     loglog(dis_kb(sel),spf*nt_wt_T{t}(sel,k),'r^','MarkerSize',4); hold on;
     loglog(dis_kb(sel),spf*dTag_wt_T{t}(sel,k),'bo','MarkerSize',4); hold on;
-    if k==3
-    plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_wt_T{t}(sel,:)','r-');
-    plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_wt_T{t}(sel,:)','b-');
-    end
+    % if k==3
+    plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_wt_T{t}(sel,:,k)','r-');
+    plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_wt_T{t}(sel,:,k)','b-');
+    % end
     plot([tb,tb],[1,5e4],'k--');
     max(spf*dTag_wt_T{t}(sel,3))
     box off; 
@@ -384,7 +382,7 @@ for t=1:N
     title(['search time ',num2str(thetas(t)), ' nm'])
     % 
 
-    k=k+1; subplot(4,N,1*N+t);
+    subplot(3,N,1*N+t);
     fph = 2*60*60;  % frames to hours
     loglog(dis_kb',fph*p3_freq_nt_T{t},'r^','MarkerSize',4); hold on;
     plot([dis_kb;dis_kb],fph*p3_freq_nt_ci_T{t}','r-'); hold on;
@@ -394,51 +392,73 @@ for t=1:N
      xlim([4,1e5]);
     box off;
     xlabel('genomic separation (kb)');
-    ylabel('passage frequency (events/hr)');
+    ylabel('search frequency (events/hr)');
     set(gcf,'color','w');
-    title('passage frequency')
+    title('search frequency')
     % title(['contact threshold=',num2str(theta)]);
     
-     k=k+1; subplot(4,N,2*N+t);
-    loglog(dis_kb',spf*cd_nt_T{t},'r^','MarkerSize',4); hold on;
-    plot([dis_kb;dis_kb],spf*cd_nt_ci_T{t},'r-'); hold on;
-    plot(dis_kb',spf*cd_dTag_T{t},'bo','MarkerSize',4); hold on;
-    plot([dis_kb;dis_kb],spf*cd_dTag_ci_T{t},'b-'); hold on;
+    subplot(3,N,2*N+t);
+    loglog(dis_kb',spf*cd_nt_T{t}(:,:,2),'r^','MarkerSize',4); hold on;
+    plot([dis_kb;dis_kb],spf*cd_nt_ci_T{t}(:,:,:,2),'r-'); hold on;
+    plot(dis_kb',spf*cd_dTag_T{t}(:,:,2),'bo','MarkerSize',4); hold on;
+    plot([dis_kb;dis_kb],spf*cd_dTag_ci_T{t}(:,:,:,2),'b-'); hold on;
     plot([tb,tb],[.1,100],'k--');
     box off;
     xlabel('genomic separation (kb)');
     ylabel('contact duration (s)');
-    ylim([.7 2*t^2]);
+    ylim([.1, 50]);
     title('contact duration')
-    % title(['contact threshold=',num2str(theta)]);
-    
-    subplot(4,N,3*N+t);
-    if thetas(t)<300; k=3; else k=1; end;
-    loglog(dis_kb(sel),spf*nt_pt_T{t}(sel,3),'r^','MarkerSize',4); hold on;
-    loglog(dis_kb(sel),spf*dTag_pt_T{t}(sel,3),'bo','MarkerSize',4); hold on;
-    if k==3
-        plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_pt_T{t}(sel,:)','r-');
-        plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_pt_T{t}(sel,:)','b-');
-    end
-    plot([tb,tb],[1,5e4],'k--');
-    box off; 
-    xlim([4,1e5]);   ylim([1,.5e4]); set(gca,'YTick',logspace(0,3,4),'YTickLabel',logspace(0,3,4))
-    xlabel('genome distance (kb)');
-    ylabel('passage time (s)')
-    title('passage time')
 end
 
 %% G1 vs G2   
-
-
+clc;
 
 data3D_g1 = data3D;
 data3D_g2 = data3D;
-for i=1:numel(data3D_g1)
-    g1 = data3D_g1{i}(:,end) < 5;
-    data3D_g1{i} = data3D_g1{i}(g1,:);
-    data3D_g2{i} = data3D_g2{i}(~g1,:);
+[nCond,nG] = size(data3D);
+for g=1:nG
+    c=1;
+    % a more conserved threshold is needed when sisters are paired 
+    % this is based on calibration by FACs
+    g1 = data3D{c,g}(:,end) < 3; 
+    data3D_g1{c,g} = data3D{c,g}(g1,:);
+    data3D_g2{c,g} = data3D{c,g}(~g1,:);
+    c=2;
+    g1 = data3D{c,g}(:,end) < 5;
+    data3D_g1{c,g} = data3D{c,g}(g1,:);
+    data3D_g2{c,g} = data3D{c,g}(~g1,:);
 end
+
+
+n_g1_wt = cellfun(@(x) size(x,1),data3D_g1(1,:));
+n_g2_wt = cellfun(@(x) size(x,1),data3D_g2(1,:));
+n_g1_dtag = cellfun(@(x) size(x,1),data3D_g1(2,:));
+n_g2_dtag = cellfun(@(x) size(x,1),data3D_g2(2,:));
+
+
+frac_g2_wt = n_g2_wt./(n_g1_wt + n_g2_wt);
+frac_g2_dtag = n_g2_dtag./(n_g1_dtag + n_g2_dtag);
+
+
+
+%%
+figure(4); clf; subplot(2,1,1);
+bar([frac_g2_wt;frac_g2_dtag]');
+set(gca,'XTick',1:11,'XTickLabels',dis_kb);
+ylabel('Fraction in G2');
+box off;
+legend('untreated','+dTAG','Location','eastoutside');
+title('G2 fraction')
+
+subplot(2,1,2);
+semilogy(1,1,'w.'); hold on;
+bar([n_g1_wt; n_g1_dtag; n_g2_wt;  n_g2_dtag]');
+set(gca,'XTick',1:11,'XTickLabels',dis_kb);
+ylabel('trace count');
+box off;
+legend('skip','G1 untreated','G1 +dTAG','G2 untreated','G2 +dTag','Location','eastoutside');
+title('cell cycle states')
+
 
 %% 
 theta = 50;
@@ -446,20 +466,14 @@ theta = 50;
 [nt_wt_50_g1,   nt_ci_wt50_g1] = CompContactWaitingKM(data3D_g1(1,:),'d_contact',theta);
 [dTag_wt_50_g1, dTag_ci_wt50_g1] = CompContactWaitingKM(data3D_g1(2,:),'d_contact',theta);
 
-[nt_pt_50_g1,   nt_ci_pt50_g1] = CompFirstPassageKM(data3D_g1(1,:),'d_contact',theta);
-[dTag_pt_50_g1, dTag_ci_pt50_g1] = CompFirstPassageKM(data3D_g1(2,:),'d_contact',theta);
-
 [p3_freq_nt_g1,p3_freq_nt_ci_g1] = CompPassageFreq(data3D_g1(1,:),'d_contact',theta);
 [p3_freq_dTag_g1,p3_freq_dTag_ci_g1] = CompPassageFreq(data3D_g1(2,:),'d_contact',theta);
 
-[cd_nt_g1,cd_nt_ci_g1] = ContactDuration(data3D_g1(1,:),'theta',theta);
-[cd_dTag_g1,cd_dTag_ci_g1] = ContactDuration(data3D_g1(2,:),'theta',theta);
+[cd_nt_g1,cd_nt_ci_g1] = ContactDurationKM(data3D_g1(1,:),'theta',theta);
+[cd_dTag_g1,cd_dTag_ci_g1] = ContactDurationKM(data3D_g1(2,:),'theta',theta);
 
 [nt_wt_500_g1,   nt_ci_wt500_g1] = CompContactWaitingKM(data3D_g1(1,:),'d_contact',500);
 [dTag_wt_500_g1, dTag_ci_wt500_g1] = CompContactWaitingKM(data3D_g1(2,:),'d_contact',500);
-
-[nt_pt_500_g1,   nt_ci_pt500_g1] = CompFirstPassageKM(data3D_g1(1,:),'d_contact',500);
-[dTag_pt_500_g1, dTag_ci_pt500_g1] = CompFirstPassageKM(data3D_g1(2,:),'d_contact',500);
 
 %%
 gry1 = [.4 .4 .4];
@@ -469,6 +483,8 @@ spf = 0.5; % seconds per frame
 tb = 600; % TAD border
 tc = [.75 0 0]; % TAD border line color
 figure(1); clf;
+y0 = .06; % ref lines
+y1 = .03;
 
 subplot(2,4,1);
 loglog(dis_kb(sel),spf*nt_wt_50_g1(sel,3),'r^','MarkerSize',4); hold on;
@@ -484,11 +500,11 @@ plot([dis_kb(sel); dis_kb(sel)],sc*spf*dTag_ci_wt500_g1(sel,:,1)','b-');
 plot([tb,tb],[1,5e6],'--','color',tc);
 xx = logspace(1,5,5);
 rectangle('Position',[14,6,1.2e3,.2e4],'edgecolor',.7*ones(1,3));
-plot(xx,.064*xx.^(2),'--','color',gry2);
-plot(xx,.19*xx.^(5/3),'--','color',gry1);
+plot(xx,y1*xx.^(2),'--','color',gry2);
+plot(xx,y0*xx.^(5/3),'--','color',gry1);
 box off; 
 xlim([4,1e5]);  ylim([4,.8e6]);
-xlabel('genome distance (kb)');
+xlabel('genome separation (kb)');
 ylabel('search time (s)');
 title('G1 search time')
 
@@ -501,11 +517,12 @@ loglog(dis_kb(sel),spf*dTag_wt_50_g1(sel,3),'bo','MarkerSize',4); hold on;
 plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_wt50_g1(sel,:,3)','b-');
 plot([tb,tb],[1,5e6],'--','color',tc);
 xx = logspace(1,5,5);
-plot(xx,.064*xx.^(2),'--','color',gry2);
-plot(xx,.19*xx.^(5/3),'--','color',gry1);
+
+plot(xx,y1*xx.^(2),'--','color',gry2);
+plot(xx,y0*xx.^(5/3),'--','color',gry1);
 box off; 
 xlim([14,1.2e3]);  ylim([6,.2e4]);
-xlabel('genome distance (kb)');
+xlabel('genome separation (kb)');
 ylabel('search time (s)');
 title('G1 search time')
 
@@ -521,68 +538,21 @@ box off;
 xlabel('genomic separation (kb)');
 ylabel('passage frequency (events/hr)');
 set(gcf,'color','w');
-title('G1 passage frequency')
+title('G1 search frequency')
 % title(['contact threshold=',num2str(theta)]);
 
 subplot(2,4,4);
-loglog(dis_kb',cd_nt_g1,'r^','MarkerSize',4); hold on;
-plot([dis_kb;dis_kb],cd_nt_ci_g1,'r-'); hold on;
-plot(dis_kb',cd_dTag_g1,'bo','MarkerSize',4); hold on;
-plot([dis_kb;dis_kb],cd_dTag_ci_g1,'b-'); hold on;
+loglog(dis_kb',spf*cd_nt_g1(:,:,2),'r^','MarkerSize',4); hold on;
+plot([dis_kb;dis_kb],spf*cd_nt_ci_g1(:,:,:,2),'r-'); hold on;
+plot(dis_kb',spf*cd_dTag_g1(:,:,2),'bo','MarkerSize',4); hold on;
+plot([dis_kb;dis_kb],spf*cd_dTag_ci_g1(:,:,:,2),'b-'); hold on;
 plot([tb,tb],[.1,10],'--','color',tc);
 box off;
 xlabel('genomic separation (kb)');
 ylabel('contact duration (s)');
-ylim([.9 1.4]);
+ylim([.4 .8]);
 title('G1 contact duration')
 % title(['contact threshold=',num2str(theta)]);
-
-
-
-
-sel =8:11;
-figure(2); clf; 
-loglog(dis_kb(sel),spf*nt_wt_500_g1(sel,1),'r^','MarkerSize',4); hold on
-% plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_wt500(sel,:)','r-');
-loglog(dis_kb(sel),spf*dTag_wt_500_g1(sel,1),'bo','MarkerSize',4); hold on;
-% plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_wt500(sel,:)','b-');
-xx = logspace(1,5,5);
-plot(xx,5e-5*xx.^(5/3),'--','color',gry1);
-xlim([600,1e5]); box off;
-ylim([.9,1e3]);
-xlabel('genomic separation (kb)');
-ylabel('G1 search time to 500 nm')
-% QuickLogFit( dis_kb(sel),spf*dTag_wt_500(sel,1) ); box off;
-
-figure(3); clf;
-subplot(1,2,1); sel=1:8;
-loglog(dis_kb(sel),spf*nt_pt_50_g1(sel,3),'r^','MarkerSize',4); hold on;
-plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_pt50_g1(sel,:,3)','r-');
-loglog(dis_kb(sel),spf*dTag_pt_50_g1(sel,3),'bo','MarkerSize',4); hold on;
-plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_pt50_g1(sel,:,3)','b-');
-plot([tb,tb],[1,5e4],'--','color',tc);
-xx = logspace(1,5,5);
-plot(xx,.02*xx.^(2),'--','color',gry2);
-plot(xx,.06*xx.^(5/3),'--','color',gry1);
-box off; 
-xlim([4,1e5]);  ylim([1,.5e4]);
-xlabel('genome distance (kb)');
-ylabel('passage time (s)')
-title('G1 passage time')
-
-subplot(1,2,2);
-sel =8:11;
-loglog(dis_kb(sel),spf*nt_pt_500_g1(sel,1),'r^','MarkerSize',4); hold on
-plot([dis_kb(sel); dis_kb(sel)],spf*nt_ci_pt500_g1(sel,:,1)','r-');
-loglog(dis_kb(sel),spf*dTag_pt_500_g1(sel,1),'bo','MarkerSize',4); hold on;
-plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_pt500_g1(sel,:,1)','b-');
-xx = logspace(1,5,5);
-plot(xx,5e-5*xx.^(5/3),'--','color',gry1);
-xlim([600,1e5]); box off;
-ylim([.1,1e3]);
-xlabel('genomic separation (kb)');
-ylabel('passage time to 500 nm')
-% QuickLogFit( dis_kb(sel),spf*dTag_wt_500(sel,1) ); box off;
 
 figure(1); subplot(2,4,1);
 QuickLogFit(dis_kb(2:10),[spf*dTag_wt_50_g1(2:8,3); sc*spf*dTag_wt_500_g1(9:10,1)])
@@ -595,22 +565,16 @@ theta = 50;
 
 [nt_wt_50_g2,   nt_ci_wt50_g2] = CompContactWaitingKM(data3D_g2(1,:),'d_contact',theta);
 [dTag_wt_50_g2, dTag_ci_wt50_g2] = CompContactWaitingKM(data3D_g2(2,:),'d_contact',theta);
-
-[nt_pt_50_g2,   nt_ci_pt50_g2] = CompFirstPassageKM(data3D_g2(1,:),'d_contact',theta);
-[dTag_pt_50_g2, dTag_ci_pt50_g2] = CompFirstPassageKM(data3D_g2(2,:),'d_contact',theta);
-
+% 
 [p3_freq_nt_g2,p3_freq_nt_ci_g2] = CompPassageFreq(data3D_g2(1,:),'d_contact',theta);
 [p3_freq_dTag_g2,p3_freq_dTag_ci_g2] = CompPassageFreq(data3D_g2(2,:),'d_contact',theta);
 
-[cd_nt_g2,cd_nt_ci_g2] = ContactDuration(data3D_g2(1,:),'theta',theta);
-[cd_dTag_g2,cd_dTag_ci_g2] = ContactDuration(data3D_g2(2,:),'theta',theta);
+[cd_nt_g2,cd_nt_ci_g2] = ContactDurationKM(data3D_g2(1,:),'theta',theta);
+[cd_dTag_g2,cd_dTag_ci_g2] = ContactDurationKM(data3D_g2(2,:),'theta',theta);
 
 [nt_wt_500_g2,   nt_ci_wt500_g2] = CompContactWaitingKM(data3D_g2(1,:),'d_contact',500);
 [dTag_wt_500_g2, dTag_ci_wt500_g2] = CompContactWaitingKM(data3D_g2(2,:),'d_contact',500);
-
-[nt_pt_500_g2,   nt_ci_pt500_g2] = CompFirstPassageKM(data3D_g2(1,:),'d_contact',500);
-[dTag_pt_500_g2, dTag_ci_pt500_g2] = CompFirstPassageKM(data3D_g2(2,:),'d_contact',500);
-
+% 
 %%
 gry1 = [.4 .4 .4];
 gry2 = [.8 .8 .8];
@@ -634,13 +598,13 @@ plot([dis_kb(sel); dis_kb(sel)],sc*spf*dTag_ci_wt500_g2(sel,:,1)','b-');
 plot([tb,tb],[1,5e6],'--','color',tc);
 xx = logspace(1,5,5);
 rectangle('Position',[14,6,1.2e3,.2e4],'edgecolor',.7*ones(1,3));
-plot(xx,.064*xx.^(2),'--','color',gry2);
-plot(xx,.19*xx.^(5/3),'--','color',gry1);
+plot(xx,y1*xx.^(2),'--','color',gry2);
+plot(xx,y0*xx.^(5/3),'--','color',gry1);
 box off; 
 xlim([4,1e5]);  ylim([4,.8e6]);
 xlabel('genome distance (kb)');
 ylabel('search time (s)');
-title('g2 search time')
+title('G2 search time')
 
 sel = 1:8;
 subplot(2,4,6);
@@ -650,8 +614,8 @@ loglog(dis_kb(sel),spf*dTag_wt_50_g2(sel,3),'bo','MarkerSize',4); hold on;
 plot([dis_kb(sel); dis_kb(sel)],spf*dTag_ci_wt50_g2(sel,:,3)','b-');
 plot([tb,tb],[1,5e6],'--','color',tc);
 xx = logspace(1,5,5);
-plot(xx,.064*xx.^(2),'--','color',gry2);
-plot(xx,.19*xx.^(5/3),'--','color',gry1);
+plot(xx,y1*xx.^(2),'--','color',gry2);
+plot(xx,y0*xx.^(5/3),'--','color',gry1);
 box off; 
 xlim([14,1.2e3]);  ylim([6,.2e4]);
 xlabel('genome distance (kb)');
@@ -674,15 +638,15 @@ title('G2 passage frequency')
 % title(['contact threshold=',num2str(theta)]);
 
 subplot(2,4,8);
-loglog(dis_kb',cd_nt_g2,'r^','MarkerSize',4); hold on;
-plot([dis_kb;dis_kb],cd_nt_ci_g2,'r-'); hold on;
-plot(dis_kb',cd_dTag_g2,'bo','MarkerSize',4); hold on;
-plot([dis_kb;dis_kb],cd_dTag_ci_g2,'b-'); hold on;
+loglog(dis_kb',spf*cd_nt_g2(:,:,2),'r^','MarkerSize',4); hold on;
+plot([dis_kb;dis_kb],spf*cd_nt_ci_g2(:,:,:,2),'r-'); hold on;
+plot(dis_kb',spf*cd_dTag_g2(:,:,2),'bo','MarkerSize',4); hold on;
+plot([dis_kb;dis_kb],spf*cd_dTag_ci_g2(:,:,:,2),'b-'); hold on;
 plot([tb,tb],[.1,10],'--','color',tc);
 box off;
 xlabel('genomic separation (kb)');
 ylabel('contact duration (s)');
-ylim([.9 1.4]);
+ylim([.4 .8]);
 title('G2 contact duration')
 % title(['contact threshold=',num2str(theta)]);
 
@@ -700,11 +664,50 @@ QuickLogFit(dis_kb(2:7),[spf*nt_wt_50_g2(2:7,3)],'plotOpts',{'r-'})
 
 data3D_2_g1 = data3D_2;
 data3D_2_g2 = data3D_2;
-for i=1:numel(data3D_2_g1)
-    g1 = data3D_2_g1{i}(:,end) < 5;
-    data3D_2_g1{i} = data3D_2_g1{i}(g1,:);
-    data3D_2_g2{i} = data3D_2_g2{i}(~g1,:);
+clc;
+
+[nCond,nG] = size(data3D_2);
+for g=1:nG
+    c=1;
+    % a more conserved threshold is needed when sisters are paired 
+    % this is based on calibration by FACs
+    g1 = data3D_2{c,g}(:,end) < 4; 
+    data3D_2_g1{c,g} = data3D_2{c,g}(g1,:);
+    data3D_2_g2{c,g} = data3D_2{c,g}(~g1,:);
+    c=2;
+    g1 = data3D_2{c,g}(:,end) < 5;
+    data3D_2_g1{c,g} = data3D_2{c,g}(g1,:);
+    data3D_2_g2{c,g} = data3D_2{c,g}(~g1,:);
 end
+
+n_g1_wt = cellfun(@(x) size(x,1),data3D_2_g1(1,:));
+n_g2_wt = cellfun(@(x) size(x,1),data3D_2_g2(1,:));
+n_g1_dtag = cellfun(@(x) size(x,1),data3D_2_g1(2,:));
+n_g2_dtag = cellfun(@(x) size(x,1),data3D_2_g2(2,:));
+
+frac_g2_wt = n_g2_wt./(n_g1_wt + n_g2_wt);
+frac_g2_dtag = n_g2_dtag./(n_g1_dtag + n_g2_dtag);
+
+
+
+figure(4); clf; subplot(2,1,1);
+bar([frac_g2_wt;frac_g2_dtag]');
+set(gca,'XTick',1:11,'XTickLabels',dis_kb2_sign);
+ylabel('Fraction in G2');
+box off;
+legend('untreated','+dTAG','Location','eastoutside');
+title('G2 fraction')
+
+subplot(2,1,2);
+semilogy(1,1,'w.'); hold on;
+bar([n_g1_wt; n_g1_dtag; n_g2_wt;  n_g2_dtag]');
+set(gca,'XTick',1:11,'XTickLabels',dis_kb2_sign);
+ylabel('trace count');
+box off;
+legend('skip','G1 untreated','G1 +dTAG','G2 untreated','G2 +dTag','Location','eastoutside');
+title('cell cycle states')
+
+
 
 %% compute domain 2, G1
 
@@ -713,45 +716,42 @@ theta = 50;
 [nt2_wt_50_g1,   nt2_ci_wt50_g1] = CompContactWaitingKM(data3D_2_g1(1,:),'d_contact',theta);
 [dTag2_wt_50_g1, dTag2_ci_wt50_g1] = CompContactWaitingKM(data3D_2_g1(2,:),'d_contact',theta);
 
-[nt2_fp_50_g1,   nt2_ci_fp50_g1] = CompFirstPassageKM(data3D_2_g1(1,:),'d_contact',theta);
-[dTag2_fp_50_g1, dTag2_ci_fp50_g1] = CompFirstPassageKM(data3D_2_g1(2,:),'d_contact',theta);
+[pt2_freq_nt_g1,   pt2_freq_nt_ci_g1] = CompPassageFreq(data3D_2_g1(1,:),'d_contact',theta);
+[pt2_freq_dTag_g1, pt2_freq_dTag_ci_g1] = CompPassageFreq(data3D_2_g1(2,:),'d_contact',theta);
 
-[pt2_freq_nt_g1,pt2_freq_nt_ci_g1] = CompPassageFreq(data3D_2_g1(1,:),'d_contact',theta);
-[pt2_freq_dTag_g1,pt2_freq_dTag_ci_g1] = CompPassageFreq(data3D_2_g1(2,:),'d_contact',theta);
-
-[cd2_nt_g1,cd2_nt_ci_g1] = ContactDuration(data3D_2_g1(1,:),'theta',theta);
-[cd2_dTag_g1,cd2_dTag_ci_g1] = ContactDuration(data3D_2_g1(2,:),'theta',theta);
+[cd2_nt_g1,cd2_nt_ci_g1] = ContactDurationKM(data3D_2_g1(1,:),'theta',theta);
+[cd2_dTag_g1,cd2_dTag_ci_g1] = ContactDurationKM(data3D_2_g1(2,:),'theta',theta);
 
 
 
 %% plot results domain 2, G1
 figure(6); clf;
-subplot(2,4,1); 
-semilogy(dis_kb2_sign,spf*nt2_fp_50_g1(:,3),'r^','MarkerSize',4); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_fp50_g1(:,:,3)','r-'); hold on;
-plot([-50,-50],[4,5e3],'k--');
-box off; xlim([-500 500]); ylim([4,800]);  ylabel('G1  median passage time (s)')
 
-subplot(2,4,2); 
+
+subplot(2,3,1); 
+semilogy(dis_kb2_sign,spf*nt2_wt_50_g1(:,3),'r^','MarkerSize',4); hold on;
+plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_wt50_g1(:,:,3)','r-'); hold on;
+plot([-50,-50],[10,1e3],'k--');
+box off; xlim([-500 500]); ylim([10,1e3]); 
+ylabel('med. search time (s)');
+xlabel('genomic separation')
+
+subplot(2,3,2); 
 semilogy(dis_kb2_sign,fph*pt2_freq_nt_g1,'r^','MarkerSize',4); hold on;
 plot([dis_kb2_sign;dis_kb2_sign],fph*pt2_freq_nt_ci_g1','r-'); hold on;
 plot([-50,-50],[1,20],'k--');
 box off; xlim([-500 500]);   ylim([3.,15]);
 ylabel('passage freq. (events/hr)');
+xlabel('genomic separation')
 
-subplot(2,4,3); 
-semilogy(dis_kb2_sign,spf*nt2_wt_50_g1(:,3),'r^','MarkerSize',4); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_wt50_g1(:,:,3)','r-'); hold on;
-plot([-50,-50],[10,1e3],'k--');
-box off; xlim([-500 500]); ylim([10,1e3]); ylabel('med. search time (s)');
-
-subplot(2,4,4); 
-semilogy(dis_kb2_sign,cd2_nt_g1,'r^'); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],cd2_nt_ci_g1,'r-'); hold on;
-plot([-50,-50],[.5,1.4],'k--');
+subplot(2,3,3); 
+semilogy(dis_kb2_sign,spf*cd2_nt_g1(:,:,2),'r^'); hold on;
+plot([dis_kb2_sign;dis_kb2_sign],spf*cd2_nt_ci_g1(:,:,:,2),'r-'); hold on;
+plot([-50,-50],[.05,1.4],'k--');
 box off; xlim([-500 500]);
-ylim([.9,1.3])
+ylim([.4,.8])
 ylabel('ave. contact duration (s)');
+xlabel('genomic separation')
 
 %% compute domain 2 G2
 theta = 50;
@@ -759,46 +759,41 @@ theta = 50;
 [nt2_wt_50_g2,   nt2_ci_wt50_g2] = CompContactWaitingKM(data3D_2_g2(1,:),'d_contact',theta);
 [dTag2_wt_50_g2, dTag2_ci_wt50_g2] = CompContactWaitingKM(data3D_2_g2(2,:),'d_contact',theta);
 
-[nt2_fp_50_g2,   nt2_ci_fp50_g2] = CompFirstPassageKM(data3D_2_g2(1,:),'d_contact',theta);
-[dTag2_fp_50_g2, dTag2_ci_fp50_g2] = CompFirstPassageKM(data3D_2_g2(2,:),'d_contact',theta);
+[pt2_freq_nt_g2,   pt2_freq_nt_ci_g2] = CompPassageFreq(data3D_2_g2(1,:),'d_contact',theta);
+[pt2_freq_dTag_g2, pt2_freq_dTag_ci_g2] = CompPassageFreq(data3D_2_g2(2,:),'d_contact',theta);
 
-[pt2_freq_nt_g2,pt2_freq_nt_ci_g2] = CompPassageFreq(data3D_2_g2(1,:),'d_contact',theta);
-[pt2_freq_dTag_g2,pt2_freq_dTag_ci_g2] = CompPassageFreq(data3D_2_g2(2,:),'d_contact',theta);
-
-[cd2_nt_g2,cd2_nt_ci_g2] = ContactDuration(data3D_2_g2(1,:),'theta',theta);
-[cd2_dTag_g2,cd2_dTag_ci_g2] = ContactDuration(data3D_2_g2(2,:),'theta',theta);
+[cd2_nt_g2,cd2_nt_ci_g2] = ContactDurationKM(data3D_2_g2(1,:),'theta',theta);
+[cd2_dTag_g2,cd2_dTag_ci_g2] = ContactDurationKM(data3D_2_g2(2,:),'theta',theta);
 
 
 
 %% plot results (domain 2, G2)
 figure(6); 
-subplot(2,4,5); 
-semilogy(dis_kb2_sign,spf*nt2_fp_50_g2(:,3),'r^','MarkerSize',4); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_fp50_g2(:,:,3)','r-'); hold on;
-plot([-50,-50],[4,1e3],'k--');
-box off; xlim([-500 500]); ylim([4,130]);  ylabel('G2  median passage time (s)')
 
-subplot(2,4,6); 
+subplot(2,3,4); 
+semilogy(dis_kb2_sign,spf*nt2_wt_50_g2(:,3),'r^','MarkerSize',4); hold on;
+plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_wt50_g2(:,:,3)','r-'); hold on;
+plot([-50,-50],[10,1e3],'k--');
+box off; xlim([-500 500]); ylim([10,1e3]); 
+ylabel('med. search time (s)');
+xlabel('genomic separation (kb)')
+
+subplot(2,3,5); 
 semilogy(dis_kb2_sign,fph*pt2_freq_nt_g2,'r^','MarkerSize',4); hold on;
 plot([dis_kb2_sign;dis_kb2_sign],fph*pt2_freq_nt_ci_g2','r-'); hold on;
 plot([-50,-50],[1,20],'k--');
 box off; xlim([-500 500]);   ylim([3.,15]);
 ylabel('passage freq. (events/hr)');
+xlabel('genomic separation (kb)');
 
-subplot(2,4,7); 
-semilogy(dis_kb2_sign,spf*nt2_wt_50_g2(:,3),'r^','MarkerSize',4); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_wt50_g2(:,:,3)','r-'); hold on;
-plot([-50,-50],[10,1e3],'k--');
-box off; xlim([-500 500]); ylim([10,1e3]); ylabel('med. search time (s)');
-
-subplot(2,4,8); 
-semilogy(dis_kb2_sign,cd2_nt_g2,'r^'); hold on;
-plot([dis_kb2_sign;dis_kb2_sign],cd2_nt_ci_g2,'r-'); hold on;
-plot([-50,-50],[.5,1.4],'k--');
+subplot(2,3,6); 
+semilogy(dis_kb2_sign,spf*cd2_nt_g2(:,:,2),'r^'); hold on;
+plot([dis_kb2_sign;dis_kb2_sign],spf*cd2_nt_ci_g2(:,:,:,2),'r-'); hold on;
+plot([-50,-50],[.05,1.4],'k--');
 box off; xlim([-500 500]);
-ylim([.9,1.3])
+ylim([0.4,0.8])
 ylabel('ave. contact duration (s)');
-
+xlabel('genomic separation (kb)');
 
 
 
@@ -807,39 +802,39 @@ ths = 4; %  length(thetas); % above 350 and 500 nm search times are often 1-2 fr
 figure(6); clf;
 for t=1:ths   
     theta = thetas(t); % 50;   
-    [nt2_wt_50_th,   nt2_ci_wt50_th] = CompContactWaitingKM(data3D_2(1,:),'d_contact',theta);
-    [dTag2_wt_50_th, dTag2_ci_wt50_th] = CompContactWaitingKM(data3D_2(2,:),'d_contact',theta);
-    [nt2_fp_50_th,   nt2_ci_fp50_th] = CompFirstPassageKM(data3D_2(1,:),'d_contact',theta);
-    [dTag2_fp_50_th, dTag2_ci_fp50_th] = CompFirstPassageKM(data3D_2(2,:),'d_contact',theta);
+    [nt2_wt_50_th,   nt2_ci_wt50_th] = CompContactWaitingKM(data3D_2(1,:),'d_contact',theta,'iters',10);
+    [dTag2_wt_50_th, dTag2_ci_wt50_th] = CompContactWaitingKM(data3D_2(2,:),'d_contact',theta,'iters',10);
     [pt2_freq_nt_th,pt2_freq_nt_ci_th] = CompPassageFreq(data3D_2(1,:),'d_contact',theta);
     [pt2_freq_dTag_th,pt2_freq_dTag_ci_th] = CompPassageFreq(data3D_2(2,:),'d_contact',theta);
-    [cd2_nt_th,cd2_nt_ci_th] = ContactDuration(data3D_2(1,:),'theta',theta);
-    [cd2_dTag_th,cd2_dTag_ci_th] = ContactDuration(data3D_2(2,:),'theta',theta);    
+    [cd2_nt_th,cd2_nt_ci_th] = ContactDurationKM(data3D_2(1,:),'theta',theta);
+    [cd2_dTag_th,cd2_dTag_ci_th] = ContactDurationKM(data3D_2(2,:),'theta',theta);    
     % plot results
-    subplot(ths,4,1+(t-1)*4); 
-        semilogy(dis_kb2_sign,spf*nt2_fp_50_th(:,3),'r^','MarkerSize',4); hold on;
-        plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_fp50_th(:,:,3)','r-'); hold on;
-        plot([-50,-50],[4,5e3],'k--');
-        box off;  xlim([-500 500]); %  ylim([4,800]);  
-        ylabel(['theta = ',num2str(theta) ,'  median passage time (s)'])  
-    subplot(ths,4,2+(t-1)*4); 
-        semilogy(dis_kb2_sign,fph*pt2_freq_nt_th,'r^','MarkerSize',4); hold on;
-        plot([dis_kb2_sign;dis_kb2_sign],fph*pt2_freq_nt_ci_th','r-'); hold on;
-        plot([-50,-50],[1,200],'k--');
-        box off; xlim([-500 500]);  %  ylim([3.,15]);
-        ylabel('passage freq. (events/hr)');    
-    subplot(ths,4,3+(t-1)*4); 
+    
+         subplot(ths,3,1+(t-1)*3); 
         semilogy(dis_kb2_sign,spf*nt2_wt_50_th(:,3),'r^','MarkerSize',4); hold on;
         plot([dis_kb2_sign;dis_kb2_sign],spf*nt2_ci_wt50_th(:,:,3)','r-'); hold on;
-        plot([-50,-50],[1,1e3],'k--');
+        plot([-50,-50],[1,1e4],'k--');
+         ylim([.9*min(spf*nt2_ci_wt50_th(:)),1.1*max(spf*nt2_ci_wt50_th(:))])
         box off; xlim([-500 500]); % ylim([10,1e3]); 
         ylabel('med. search time (s)');
-    subplot(ths,4,4+(t-1)*4); 
-        semilogy(dis_kb2_sign,cd2_nt_th,'r^'); hold on;
-        plot([dis_kb2_sign;dis_kb2_sign],cd2_nt_ci_th,'r-'); hold on;
-        plot([-50,-50],[.5,10],'k--');
+        xlabel('genomic separation (kb)')
+
+        subplot(ths,3,2+(t-1)*3); 
+        semilogy(dis_kb2_sign,fph*pt2_freq_nt_th,'r^','MarkerSize',4); hold on;
+        plot([dis_kb2_sign;dis_kb2_sign],fph*pt2_freq_nt_ci_th','r-'); hold on;
+        plot([-50,-50],[1,400],'k--');
+        box off; xlim([-500 500]);  
+        ylim([.9*min(fph*pt2_freq_nt_ci_th(:)),1.1*max(fph*pt2_freq_nt_ci_th(:))]);
+        ylabel('passage freq. (events/hr)');   
+        xlabel('genomic separation (kb)')
+
+    subplot(ths,3,3+(t-1)*3); 
+        semilogy(dis_kb2_sign,spf*cd2_nt_th(:,:,2),'r^'); hold on;
+        plot([dis_kb2_sign;dis_kb2_sign],spf*cd2_nt_ci_th(:,:,:,2),'r-'); hold on;
+        plot([-50,-50],[.1,10],'k--');
         box off; xlim([-500 500]);
-       %  ylim([.9,1.3])
+       ylim([.1,10]);
         ylabel('ave. contact duration (s)');
+        xlabel('genomic separation (kb)')
 end
 
